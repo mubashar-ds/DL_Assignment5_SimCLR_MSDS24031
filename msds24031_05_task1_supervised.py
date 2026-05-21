@@ -200,7 +200,7 @@ plt.close()
 
 # test evaluation ...
 
-model.load_state_dict(torch.load('models/supervised_best.pt'))
+model.load_state_dict(torch.load('models/supervised_best.pt', map_location = device))
 
 test_acc = evaluate_accuracy(model,test_loader,device)
 
