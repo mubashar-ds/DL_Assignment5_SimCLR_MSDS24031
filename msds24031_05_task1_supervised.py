@@ -6,6 +6,9 @@ import torchvision.transforms as T
 
 from torch.utils.data import DataLoader
 
+import torchvision
+import torch.nn as nn
+
 set_seed(2026)
 
 transform = T.Compose([T.ToTensor(),
@@ -39,3 +42,21 @@ images, labels = next(iter(train_loader))
 print('images shape :', images.shape)
 print('labels shape : ', labels.shape)
 print('labels dtype : ', labels.dtype)
+
+def modified_resnet18():
+
+    model = torchvision.models.resnet18(weights=None)
+
+    model.conv1 = nn.Conv2d(3,64,kernel_size=3, stride=1, padding=1, bias = False)
+
+    model.maxpool = nn.Identity()
+
+    model.fc = nn.Linear(512, 10)
+
+    return model
+
+model = modified_resnet18()
+
+outputs = model(images)
+
+print('output shape :', outputs.shape)
