@@ -3,3 +3,4 @@ templates/
 models/
 
 __pycache__/
+.vscode/
