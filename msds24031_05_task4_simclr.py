@@ -5,6 +5,10 @@ import torchvision
 
 from msds24031_05_task3_similarity import simclr_loader
 
+import numpy as np
+import matplotlib.pyplot as plt
+from pathlib import Path
+
 def resnet_encoder():
 
     encoder = torchvision.models.resnet18(weights=None)
@@ -54,6 +58,28 @@ def similarity_matrix(z):
 
     return similarity_matrix
 
+def similarity_heatmap(similarity_matrix, out_path):
+
+    out_path = Path(out_path)
+
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+
+    matrix = similarity_matrix.detach().cpu().numpy()
+    
+    plt.figure(figsize=(7, 6))
+
+    plt.imshow(matrix)
+
+    plt.colorbar()
+
+    plt.title('Similarity Matrix Before Training')
+
+    plt.tight_layout()
+
+    plt.savefig(out_path, dpi = 300)
+
+    plt.close()
+
 if __name__ == '__main__':
 
     encoder = resnet_encoder()
@@ -101,3 +127,5 @@ if __name__ == '__main__':
     sim_matrix = similarity_matrix(z)
 
     print('\nsimilarity matrix shape :' , sim_matrix.shape)
+
+    similarity_heatmap(sim_matrix, 'results/similarity_matrix_before_training.png')
