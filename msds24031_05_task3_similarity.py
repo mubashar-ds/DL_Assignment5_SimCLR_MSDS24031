@@ -25,13 +25,6 @@ def simclr_loader(batch_size=64):
 
     return loader
 
-loader = simclr_loader()
-
-view1, view2, _ = next(iter(loader))
-
-print(view1.shape)
-print(view2.shape)
-
 def random_encoder():
 
     encoder = torchvision.models.resnet18(weights=None)
@@ -45,6 +38,13 @@ def random_encoder():
     return encoder
 
 def main():
+
+    loader = simclr_loader()
+
+    view1, view2, _ = next(iter(loader))
+
+    print(view1.shape)
+    print(view2.shape)
 
     encoder = random_encoder()
 
