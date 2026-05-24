@@ -32,6 +32,13 @@ class ProjectionHead(nn.Module):
     def forward(self, x):
 
         return self.layers(x)
+    
+def get_positive_pair(index, batch_size):
+
+    if index < batch_size:
+        return index + batch_size
+
+    return index - batch_size
 
 if __name__ == '__main__':
 
@@ -50,6 +57,18 @@ if __name__ == '__main__':
     z = projection_head(features)
 
     print('\nprojection shape : ', z.shape)
+
+    batch_size = 4
+
+    print('\npositive pairs\n')
+
+    for i in range(batch_size):
+
+        print(
+            f'Image {i} : '
+            f'View 1 Index = {i} , '
+            f'View 2 Index = {get_positive_pair(i, batch_size)}'
+        )
 
 
 
