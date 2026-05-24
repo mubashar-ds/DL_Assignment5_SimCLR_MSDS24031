@@ -40,13 +40,27 @@ def get_positive_pair(index, batch_size):
 
     return index - batch_size
 
+# for coisne similarity computation...
+
+def feature_batch(z1, z2):
+
+    return torch.cat([z1, z2], dim =0)
+
+def similarity_matrix(z):
+
+    z = F.normalize(z, dim = 1)
+
+    similarity_matrix = torch.matmul(z, z.T)
+
+    return similarity_matrix
+
 if __name__ == '__main__':
 
     encoder = resnet_encoder()
 
     projection_head = ProjectionHead()
 
-    loader = simclr_loader()
+    loader = simclr_loader(batch_size=64)
 
     view1, view2, _ = next(iter(loader))
 
@@ -70,7 +84,20 @@ if __name__ == '__main__':
             f'View 2 Index = {get_positive_pair(i, batch_size)}'
         )
 
+    # for cosine similarity computation..
 
+    small_loader = simclr_loader(batch_size=4)
 
+    view1, view2, _ = next(iter(small_loader))
 
-   
+    features1 = encoder(view1)
+    features2 = encoder(view2)
+
+    z1 = projection_head(features1)
+    z2 = projection_head(features2)
+
+    z = feature_batch(z1, z2)
+
+    sim_matrix = similarity_matrix(z)
+
+    print('\nsimilarity matrix shape :' , sim_matrix.shape)
