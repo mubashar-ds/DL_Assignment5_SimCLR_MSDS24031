@@ -47,3 +47,20 @@ with torch.no_grad():
 
 print(f1.shape)
 print(f2.shape)
+
+f1 = F.normalize(f1, dim=1)
+f2 = F.normalize(f2, dim=1)
+
+same_similarity = (f1 * f2).sum(dim=1)
+
+same_average = same_similarity.mean().item()
+
+different_similarity = (f1[:-1] * f2[1:]).sum(dim=1)
+
+different_average = different_similarity.mean().item()
+
+print('\naverage cosine similarity before training')
+
+print('\nsame image, two augmented views : ', round(same_average, 4))
+
+print('\ndifferent images :', round(different_average, 4))
