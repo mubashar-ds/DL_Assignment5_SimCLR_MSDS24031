@@ -15,11 +15,17 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 
-base_dataset = get_cifar10_subset(data_root = 'data', split_file='splits/train_ssl_unlabeled.txt', train = True)
+def simclr_loader(batch_size=64):
 
-simclr_dataset = TwoViewDataset(base_dataset, TwoViewTransform(simclr_transform))
+    base_dataset = get_cifar10_subset(data_root = 'data', split_file='splits/train_ssl_unlabeled.txt', train = True)
 
-loader = DataLoader(simclr_dataset, batch_size = 64, shuffle=False)
+    simclr_dataset = TwoViewDataset(base_dataset, TwoViewTransform(simclr_transform))
+
+    loader = DataLoader(simclr_dataset, batch_size = 64, shuffle=False)
+
+    return loader
+
+loader = simclr_loader()
 
 view1, view2, _ = next(iter(loader))
 
