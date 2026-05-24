@@ -44,29 +44,34 @@ def random_encoder():
 
     return encoder
 
-encoder = random_encoder()
+def main():
 
-with torch.no_grad():
+    encoder = random_encoder()
 
-    f1 = encoder(view1)
-    f2 = encoder(view2)
+    with torch.no_grad():
 
-print(f1.shape)
-print(f2.shape)
+        f1 = encoder(view1)
+        f2 = encoder(view2)
 
-f1 = F.normalize(f1, dim=1)
-f2 = F.normalize(f2, dim=1)
+    print(f1.shape)
+    print(f2.shape)
 
-same_similarity = (f1 * f2).sum(dim=1)
+    f1 = F.normalize(f1, dim=1)
+    f2 = F.normalize(f2, dim=1)
 
-same_average = same_similarity.mean().item()
+    same_similarity = (f1 * f2).sum(dim=1)
 
-different_similarity = (f1[:-1] * f2[1:]).sum(dim=1)
+    same_average = same_similarity.mean().item()
 
-different_average = different_similarity.mean().item()
+    different_similarity = (f1[:-1] * f2[1:]).sum(dim=1)
 
-print('\naverage cosine similarity before training')
+    different_average = different_similarity.mean().item()
 
-print('\nsame image, two augmented views : ', round(same_average, 4))
+    print('\naverage cosine similarity before training')
 
-print('\ndifferent images :', round(different_average, 4))
+    print('\nsame image, two augmented views : ', round(same_average, 4))
+
+    print('\ndifferent images :', round(different_average, 4))
+
+if __name__ == '__main__':
+    main()
