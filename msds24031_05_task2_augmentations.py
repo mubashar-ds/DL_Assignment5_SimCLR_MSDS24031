@@ -27,28 +27,34 @@ class TwoViewTransform:
         view2 = self.transform(image)
 
         return view1, view2
-    
-dataset = get_cifar10_subset(data_root='data',split_file = 'splits/train_labeled_10percent.txt', train=True)
 
-two_view_transform = TwoViewTransform(simclr_transform)
+def main():
 
-originals = []
-view1s = []
-view2s = []
+    dataset = get_cifar10_subset(data_root='data',split_file = 'splits/train_labeled_10percent.txt', train=True)
 
-for i in range(10):
+    two_view_transform = TwoViewTransform(simclr_transform)
 
-    image, label = dataset[i]
+    originals = []
+    view1s = []
+    view2s = []
 
-    view1, view2 = two_view_transform(image)
+    for i in range(10):
 
-    originals.append(image)
+        image, label = dataset[i]
 
-    view1s.append(view1)
+        view1, view2 = two_view_transform(image)
 
-    view2s.append(view2)
+        originals.append(image)
 
-save_augmentation_grid(originals,view1s,view2s, 'results/augmentation_examples.png')
+        view1s.append(view1)
 
-print('saved augmentation examples.')
+        view2s.append(view2)
 
+    save_augmentation_grid(originals,view1s,view2s, 'results/augmentation_examples.png')
+
+    print('saved augmentation examples.')
+
+    pass
+
+if __name__ == '__main__':
+    main()
