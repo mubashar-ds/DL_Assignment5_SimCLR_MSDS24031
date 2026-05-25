@@ -80,6 +80,33 @@ def similarity_heatmap(similarity_matrix, out_path):
 
     plt.close()
 
+# nt cent contastive loss...
+
+def nt_xent_loss(similarity_matrix,batch_size, tau =0.5):
+
+    total_loss =0.0
+
+    num_views = 2*batch_size
+
+    for i in range(num_views):
+
+        pos_index = get_positive_pair(i, batch_size)
+
+        numerator = torch.exp(similarity_matrix[i, pos_index] /tau)
+
+        denominator=0.0
+
+        for k in range(num_views):
+
+            if k == i:
+                continue
+            denominator += torch.exp(similarity_matrix[i, k] / tau)
+
+        loss = -torch.log(numerator /denominator)
+        total_loss += loss
+
+    return total_loss / num_views
+
 if __name__ == '__main__':
 
     encoder = resnet_encoder()
@@ -129,3 +156,9 @@ if __name__ == '__main__':
     print('\nsimilarity matrix shape :' , sim_matrix.shape)
 
     similarity_heatmap(sim_matrix, 'results/similarity_matrix_before_training.png')
+
+    # nt xent loss computation..
+
+    loss = nt_xent_loss(sim_matrix, batch_size=4, tau=0.5)
+
+    print('\nnt-xent loss :', round(loss.item(), 4))
