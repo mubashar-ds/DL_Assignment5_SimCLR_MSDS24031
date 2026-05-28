@@ -12,8 +12,8 @@ import torch.nn as nn
 from tqdm import tqdm
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-                             
-def train_simclr(encoder, projection_head, loader, optimizer, device, epochs = 2):
+    
+def train_simclr(encoder, projection_head, loader, optimizer, device, epochs = 50):
 
     losses = []
 
@@ -24,7 +24,9 @@ def train_simclr(encoder, projection_head, loader, optimizer, device, epochs = 2
 
         total_loss = 0.0
 
-        for view1, view2, _ in tqdm(loader, desc= f'epoch {epoch+1}/{epochs}'):
+        progress_bar = tqdm(loader, desc=f'Epoch {epoch+1}/{epochs}')
+
+        for view1, view2, _ in progress_bar:
 
             view1 = view1.to(device)
             view2 = view2.to(device)
@@ -41,18 +43,20 @@ def train_simclr(encoder, projection_head, loader, optimizer, device, epochs = 2
 
             loss = nt_xent_loss(sim_matrix, batch_size = view1.size(0), tau = 0.5)
 
-            optimizer.zero_grad()
+            optimizer.zero_grad(set_to_none=True)
             loss.backward()
             optimizer.step()
 
             total_loss += loss.item()
 
-        average_loss = total_loss/len(loader)
+            progress_bar.set_postfix(loss=f'{loss.item():.3f}')
+
+        average_loss = total_loss / len(loader)
 
         losses.append(average_loss)
 
-        print(f'\nepoch {epoch+1}/50')
-        print(f'loss : {average_loss:.3f}')
+        print(f'\nepoch {epoch+1}/{epochs}')
+        print(f'average loss : {average_loss:.3f}')
 
     return losses
 
@@ -65,5 +69,14 @@ if __name__ == '__main__':
 
     optimizer = torch.optim.Adam(list(encoder.parameters()) + list(projection_head.parameters()), lr = 3e-4)
 
-    losses = train_simclr(encoder, projection_head, loader, optimizer, device, epochs = 2)
+    losses = train_simclr(encoder, projection_head, loader, optimizer, device, epochs = 50)
+
+    torch.save({'encoder': encoder.state_dict(),
+                'projection_head': projection_head.state_dict(),
+                'losses': losses},
+                'results/simclr_model.pth')
+
+    print('\ntraining completed!')
+
+    print('\nsimclr model is saved')
 
