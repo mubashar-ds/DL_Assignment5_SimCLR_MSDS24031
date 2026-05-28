@@ -82,30 +82,29 @@ def similarity_heatmap(similarity_matrix, out_path):
 
 # nt cent contastive loss...
 
-def nt_xent_loss(similarity_matrix,batch_size, tau =0.5):
-
-    total_loss =0.0
+def nt_xent_loss(similarity_matrix, batch_size, tau= 0.5):
 
     num_views = 2*batch_size
+
+    exp_sim = torch.exp(similarity_matrix/tau)
+    mask = ~torch.eye(num_views, dtype=torch.bool,device= similarity_matrix.device)
+    exp_sim = exp_sim*mask
+
+    losses = []
 
     for i in range(num_views):
 
         pos_index = get_positive_pair(i, batch_size)
 
-        numerator = torch.exp(similarity_matrix[i, pos_index] /tau)
+        numerator = exp_sim[i, pos_index]
+        denominator = exp_sim[i].sum()
 
-        denominator=0.0
+        loss = -torch.log(numerator/denominator)
+        losses.append(loss)
 
-        for k in range(num_views):
+    losses = torch.stack(losses)
 
-            if k == i:
-                continue
-            denominator += torch.exp(similarity_matrix[i, k] / tau)
-
-        loss = -torch.log(numerator /denominator)
-        total_loss += loss
-
-    return total_loss / num_views
+    return losses.mean()
 
 if __name__ == '__main__':
 
