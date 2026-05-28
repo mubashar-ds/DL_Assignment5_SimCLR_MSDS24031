@@ -59,7 +59,7 @@ def train_simclr(encoder, projection_head, loader, optimizer, device, epochs = 5
                     'projection_head': projection_head.state_dict(),
                     'losses': losses,
                     'epoch': epoch + 1},
-                    'results/simclr_model_latest.pth')
+                    'models/simclr_model_latest.pth')
         
         print(f'\nepoch {epoch+1}/{epochs}')
         print(f'average loss : {average_loss:.3f}')
@@ -82,7 +82,7 @@ if __name__ == '__main__':
     torch.save({'encoder': encoder.state_dict(),
                 'projection_head': projection_head.state_dict(),
                 'losses': losses},
-                'results/simclr_model.pth')
+                'models/simclr_model.pth')
 
     print('\ntraining completed!')
 
