@@ -21,7 +21,8 @@ def simclr_loader(batch_size=64):
 
     simclr_dataset = TwoViewDataset(base_dataset, TwoViewTransform(simclr_transform))
 
-    loader = DataLoader(simclr_dataset, batch_size = batch_size, shuffle=False)
+    loader = DataLoader(simclr_dataset, batch_size = batch_size, shuffle=True, num_workers=4, 
+                        persistent_workers=True, pin_memory=False)
 
     return loader
 
