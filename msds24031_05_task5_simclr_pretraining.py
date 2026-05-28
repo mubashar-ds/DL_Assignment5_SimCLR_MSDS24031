@@ -73,7 +73,7 @@ if __name__ == '__main__':
     encoder = resnet_encoder().to(device)
     projection_head = ProjectionHead().to(device)
 
-    loader = simclr_loader(batch_size = 32)
+    loader = simclr_loader(batch_size = 64)
 
     optimizer = torch.optim.Adam(list(encoder.parameters()) + list(projection_head.parameters()), lr = 3e-4)
 
