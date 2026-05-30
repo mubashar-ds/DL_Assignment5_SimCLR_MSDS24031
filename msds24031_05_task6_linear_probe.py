@@ -5,6 +5,11 @@ from utils.dataset_splits import get_cifar10_subset
 import torch
 import torchvision.transforms as T
 
+import torchvision
+import torch.nn as nn
+
+from msds24031_05_task4_simclr import resnet_encoder
+
 def get_classification_loaders(batch_size=64):
 
     transform = T.Compose([T.ToTensor(),
@@ -27,3 +32,32 @@ def get_classification_loaders(batch_size=64):
     val_loader = DataLoader(val_dataset, batch_size= batch_size, shuffle =False)
 
     return train_loader, val_loader, test_loader
+
+class LinearProbe(nn.Module):
+
+    def __init__(self,encoder):
+
+        super().__init__()
+
+        self.encoder = encoder
+        self.classifier = nn.Linear(512, 10)
+
+    def forward(self,x):
+
+        features = self.encoder(x)
+        outputs = self.classifier(features)
+
+        return outputs
+    
+def freeze_encoder(encoder):
+
+    for param in encoder.parameters():
+        param.requires_grad=False
+
+if __name__ == '__main__':
+
+    encoder = resnet_encoder()
+    freeze_encoder(encoder)
+
+    model = LinearProbe(encoder)
+    print(model)
