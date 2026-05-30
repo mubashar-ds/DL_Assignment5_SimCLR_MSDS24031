@@ -43,7 +43,7 @@ train_loader = DataLoader(train_dataset, batch_size=64, shuffle = True)
 
 test_loader = DataLoader(test_dataset, batch_size=64, shuffle= False)
 
-val_loader = DataLoader(val_dataset, batch_size= 64, shuffle =True)
+val_loader = DataLoader(val_dataset, batch_size= 64, shuffle =False)
 
 images, labels = next(iter(train_loader))
 
