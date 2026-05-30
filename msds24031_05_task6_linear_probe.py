@@ -124,7 +124,7 @@ if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
-    train_loader,test_loader, val_loader = (get_classification_loaders())
+    train_loader, val_loader, test_loader = (get_classification_loaders())
 
     print('\nrandom encoder linear probe...')
 
