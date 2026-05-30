@@ -1,11 +1,9 @@
 from torch.utils.data import DataLoader
-
 from utils.dataset_splits import get_cifar10_subset
 
 import torch
 import torchvision.transforms as T
 
-import torchvision
 import torch.nn as nn
 
 from msds24031_05_task4_simclr import resnet_encoder
@@ -33,7 +31,6 @@ def get_classification_loaders(batch_size=64):
     val_loader = DataLoader(val_dataset, batch_size= batch_size, shuffle =False)
 
     return train_loader, val_loader, test_loader
-
 class LinearProbe(nn.Module):
 
     def __init__(self,encoder):
@@ -93,27 +90,58 @@ def train_probe(model,train_loader,val_loader,optimizer, criterion,device,epochs
 
         validation_accuracy = evaluate(model, val_loader,device)
 
-        print(f'epoch {epoch+1}/{epochs}')
+        print(f'\nepoch {epoch+1}/{epochs}')
         print(f'loss: {average_loss:.3f}')
         print(f'validation accuracy : {validation_accuracy:.3f}%')
 
-if __name__ == '__main__':
+def run_experiment(encoder, train_loader, val_loader, test_loader, device):
 
-    encoder = resnet_encoder()
     freeze_encoder(encoder)
+    model = LinearProbe(encoder).to(device)
+    criterion = nn.CrossEntropyLoss()
 
-    model = LinearProbe(encoder)
-    print(model)
+    optimizer = torch.optim.Adam(model.classifier.parameters(),lr=3e-4)
+    train_probe(model,train_loader,val_loader,optimizer,criterion,device,epochs=20)
+    test_accuracy = evaluate(model,test_loader,device)
+
+    return test_accuracy
+
+def save_accuracy_plot(random_accuracy,simclr_accuracy,out_path):
+
+    out_path = Path(out_path)
+    out_path.parent.mkdir(parents=True,exist_ok =True)
+
+    plt.figure(figsize=(5,4))
+
+    plt.bar(['Random', 'SimCLR'],[random_accuracy, simclr_accuracy])
+    plt.ylabel('Test Accuracy (%)')
+    plt.title('Linear Probe Evaluation')
+    plt.tight_layout()
+    plt.savefig(out_path, dpi=300)
+    plt.close()
+
+if __name__ == '__main__':
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
     train_loader,test_loader, val_loader = (get_classification_loaders())
 
-    encoder = resnet_encoder()
-    freeze_encoder(encoder)
-    model = LinearProbe(encoder).to(device)
-    
-    criterion = nn.CrossEntropyLoss()
-    optimizer = torch.optim.Adam(model.classifier.parameters(),lr=3e-4)
+    print('\nrandom encoder linear probe...')
 
-    train_probe(model,train_loader,val_loader,optimizer,criterion,device,epochs=1)
+    random_encoder = resnet_encoder()
+    random_accuracy = run_experiment(random_encoder,train_loader,val_loader,test_loader,device)
+
+    print(f'\nrandom probe test accuracy: {random_accuracy:.3f}%')
+
+    checkpoint = torch.load('models/simclr_model.pth',map_location=device)
+
+    simclr_encoder = resnet_encoder()
+    simclr_encoder.load_state_dict(checkpoint['encoder'])
+
+    print('\nsimclr encoder linear probe..')
+
+    simclr_accuracy = run_experiment(simclr_encoder,train_loader,val_loader,test_loader,device)
+
+    print(f'\nsimclr probe test accuracy: {simclr_accuracy:.3f}%')
+
+    save_accuracy_plot(random_accuracy,simclr_accuracy,'graphs/linear_probe_accuracy.png')
