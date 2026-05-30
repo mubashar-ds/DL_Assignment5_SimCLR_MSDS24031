@@ -49,4 +49,13 @@ if __name__ == '__main__':
 
     save_2d_feature_plot(random_features,random_labels,'results/random_encoder_pca.png',method='pca',title='Random Encoder PCA')
 
-  
+    # simclr encoder pca..
+
+    simclr_checkpoint = torch.load('models/simclr_model.pth',map_location=device)
+
+    simclr_encoder = (resnet_encoder().to(device))
+    simclr_encoder.load_state_dict(simclr_checkpoint['encoder'])
+    simclr_features, simclr_labels = (extract_features(simclr_encoder,val_loader,device))
+
+    save_2d_feature_plot(simclr_features,simclr_labels,'results/simclr_encoder_pca.png',method='pca',title='SimCLR Encoder PCA')
+
