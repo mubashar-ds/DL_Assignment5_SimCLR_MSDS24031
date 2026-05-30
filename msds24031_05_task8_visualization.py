@@ -59,3 +59,13 @@ if __name__ == '__main__':
 
     save_2d_feature_plot(simclr_features,simclr_labels,'results/simclr_encoder_pca.png',method='pca',title='SimCLR Encoder PCA')
 
+    # fine tuned encoder pca....
+
+    finetuned_checkpoint = torch.load('models/finetuned_encoder.pth',map_location=device)
+
+    finetuned_encoder = (resnet_encoder().to(device))
+    finetuned_encoder.load_state_dict(finetuned_checkpoint['encoder'])
+    finetuned_features, finetuned_labels = (extract_features(finetuned_encoder,val_loader,device))
+
+    save_2d_feature_plot(finetuned_features,finetuned_labels,'results/finetuned_encoder_pca.png',method='pca',
+                         title='Fine-Tuned Encoder PCA')
