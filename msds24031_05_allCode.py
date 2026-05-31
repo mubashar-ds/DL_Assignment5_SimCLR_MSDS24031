@@ -477,7 +477,7 @@ def run_experiment(encoder, train_loader, val_loader, test_loader, device):
 
     return test_accuracy
 
-def save_accuracy_plot(random_accuracy,simclr_accuracy,out_path):
+def save_accuracy_plots(random_accuracy,simclr_accuracy,out_path):
 
     out_path = Path(out_path)
     out_path.parent.mkdir(parents=True,exist_ok =True)
@@ -876,7 +876,7 @@ if __name__ == '__main__':
     simclr_accuracy = run_experiment(simclr_encoder,train_loader,val_loader,test_loader,device)
     print(f'\nsimclr probe test accuracy: {simclr_accuracy:.3f}%')
 
-    save_accuracy_plot(random_accuracy,simclr_accuracy,'graphs/linear_probe_accuracy.png')
+    save_accuracy_plots(random_accuracy,simclr_accuracy,'graphs/linear_probe_accuracy.png')
 
     # task 7 -----------------------------
 
@@ -891,6 +891,7 @@ if __name__ == '__main__':
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(model.parameters(), lr=3e-4)
 
+    print('\nfine tunining...')
     validation_accuracies = train_finetune(model,train_loader,val_loader,optimizer,criterion,device,epochs=20)
     test_accuracy = evaluate(model,test_loader,device)
     print(f'\nfine tuned test accuracy: {test_accuracy:.3f}%')
@@ -935,12 +936,6 @@ if __name__ == '__main__':
     save_metrics()
 
     # test predictions cvs...............................
-
-    df = pd.read_csv('results/test_predictions.csv')
-    print(df.shape)
-
-    prob_columns = [f'prob_class_{i}' for i in range(10)]
-    print(df.loc[0, prob_columns].sum())
 
     _, _, test_loader = (get_classification_loaders())
 
