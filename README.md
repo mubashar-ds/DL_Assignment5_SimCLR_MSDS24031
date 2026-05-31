@@ -84,6 +84,12 @@ python msds24031_05_task7_finetune.py
 python msds24031_05_task8_visualization.py
 ```
 
+### Run All Code at Once
+
+```
+python msds24031_05_allCode.py
+```
+
 ## Summary
 
 Results demonstrate that the SimCLR successfully learns meaningful visual representations from the unlabeled CIFAR10 images. The pretrained encoder achieved 74.66% accuracy using frozen linear classifier, and 81.15% accuracy after fine-tuning, significantly outperforming supervised baseline trained with only 10% labeled data (45.87%).
